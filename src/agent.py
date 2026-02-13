@@ -1,11 +1,18 @@
 """Generic agent loop using OpenAI function calling."""
 
 import json
+import time
+from typing import Callable
 from openai import OpenAI
 from src.tools import TOOL_DISPATCH
 
 MODEL = "gpt-4.1-mini"
 MAX_TURNS = 10
+
+# Callback signature: (event, data) where event is one of:
+#   "tool_call_start" -> data = {"name": str, "arguments": dict, "timestamp": float}
+#   "tool_call_end"   -> data = {"name": str, "arguments": dict, "timestamp": float, "duration": float}
+OnToolCall = Callable[[str, dict], None]
 
 
 def run_agent(
@@ -18,6 +25,7 @@ def run_agent(
     max_turns: int = MAX_TURNS,
     messages: list[dict] | None = None,
     response_format: type | None = None,
+    on_tool_call: OnToolCall | None = None,
 ) -> tuple[str, list[dict]]:
     """Run an agent loop with tool calling.
 
@@ -52,10 +60,26 @@ def run_agent(
             fn_name = tc.function.name
             fn_args = json.loads(tc.function.arguments)
 
+            if on_tool_call:
+                on_tool_call("tool_call_start", {
+                    "name": fn_name,
+                    "arguments": fn_args,
+                    "timestamp": time.time(),
+                })
+
+            t0 = time.time()
             if fn_name in tool_dispatch:
                 result = tool_dispatch[fn_name](fn_args)
             else:
                 result = json.dumps({"error": f"Unknown tool: {fn_name}"})
+
+            if on_tool_call:
+                on_tool_call("tool_call_end", {
+                    "name": fn_name,
+                    "arguments": fn_args,
+                    "timestamp": time.time(),
+                    "duration": time.time() - t0,
+                })
 
             messages.append({
                 "role": "tool",
