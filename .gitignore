@@ -1,0 +1,13 @@
+.env
+.venv/
+.claude/
+CLAUDE.MD
+__pycache__/
+*.pyc
+.DS_Store
+chroma_db/
+data/chunks/
+.ipynb_checkpoints/
+*.egg-info/
+dist/
+build/
