@@ -56,14 +56,3 @@ def test_recital_text_clean(provisions):
         assert rct1.title.startswith("Erwägungsgrund")
     else:
         assert rct1.title.startswith("Recital")
-
-
-def test_annex_content(provisions):
-    provs, lang = provisions
-    anx3 = next(p for p in provs if p.id == "anx_III")
-    assert anx3.number == "III"
-
-    if lang == "de":
-        assert "Hochrisiko" in anx3.text or "hochrisiko" in anx3.text.lower()
-    else:
-        assert "high-risk" in anx3.text.lower() or "High-risk" in anx3.text

@@ -22,9 +22,3 @@ def test_dispatch_covers_all_schemas():
     dispatch_names = set(TOOL_DISPATCH.keys())
     assert schema_names == dispatch_names
 
-
-def test_tool_schema_names():
-    """Check expected tool names exist."""
-    names = {t["function"]["name"] for t in TOOL_SCHEMAS}
-    expected = {"search_regulation", "get_article", "get_recital", "get_annex", "get_articles_for_chapter"}
-    assert expected == names

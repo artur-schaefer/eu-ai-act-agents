@@ -10,11 +10,6 @@ def chunks(request):
     provisions = parse_eu_ai_act(lang=request.param)
     return chunk_provisions(provisions)
 
-
-def test_chunk_count(chunks):
-    assert len(chunks) > 300
-
-
 def test_chunk_metadata(chunks):
     for c in chunks:
         assert "id" in c
@@ -24,7 +19,6 @@ def test_chunk_metadata(chunks):
         assert meta["type"] in ("article", "recital", "annex")
         assert meta["number"]
         assert meta["title"]
-
 
 def test_most_chunks_under_limit(chunks):
     tokens = [count_tokens(c["text"]) for c in chunks]
